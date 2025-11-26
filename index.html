@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Tevafuk | Sözlerin Hikmeti</title>
     
     <!-- Material Design 3 Fontları (Roboto & Noto Serif) -->
@@ -36,29 +36,39 @@
             user-select: none;
         }
 
-        /* --- GİRİŞ POPUP (OVERLAY) --- */
+        /* --- GİRİŞ POPUP (DÜZELTİLDİ) --- */
         #intro-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #FDFBFF; /* Hafif kırık beyaz */
-            z-index: 9999; /* En üstte */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-            overflow-y: auto; /* Ekran küçükse kaydırma olsun */
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+            background-color: #FDFBFF;
+            z-index: 9999;
+            /* Kaydırma Ayarları - Kritik Düzeltme */
+            overflow-y: auto; /* Dikey kaydırma açık */
+            -webkit-overflow-scrolling: touch; /* Mobilde akıcı kaydırma */
+            display: block; /* Flex yerine Block kullanıldı ki üst kısım kesilmesin */
         }
 
         .intro-content {
             max-width: 600px;
             width: 100%;
             text-align: center;
-            padding-bottom: 20px;
+            /* Ortalamayı margin ile yapıyoruz */
+            margin: 0 auto; 
+            padding: 60px 24px 40px 24px; /* Üstten güvenli boşluk */
+            min-height: 100%; /* İçeriğin tam yayılmasını sağlar */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Eğer ekran büyükse ortala */
+        }
+        
+        /* Ekran küçükse (Mobil) ortalamayı iptal et, üstten başlasın */
+        @media screen and (max-height: 800px) {
+            .intro-content {
+                justify-content: flex-start; /* Üstten başla */
+            }
         }
 
         /* Giriş Metni Stilleri */
@@ -71,18 +81,17 @@
         }
 
         .intro-text strong {
-            color: #000;
-            font-weight: 700;
-            /* Hafif vurgu rengi */
             color: var(--md-sys-color-primary);
+            font-weight: 700;
         }
 
         .intro-heading {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 700;
             color: var(--md-sys-color-primary);
             margin-bottom: 24px;
             display: block;
+            line-height: 1.3;
         }
 
         /* Buton Grubu */
@@ -93,13 +102,14 @@
             width: 100%;
             max-width: 400px;
             margin: 0 auto;
+            padding-bottom: 20px;
         }
 
         /* WhatsApp Butonu */
         .btn-whatsapp {
             background-color: #25D366;
             color: white;
-            padding: 14px;
+            padding: 16px;
             border-radius: 24px;
             border: none;
             font-family: var(--font-ui);
@@ -111,27 +121,25 @@
             justify-content: center;
             gap: 10px;
             text-decoration: none;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             transition: transform 0.2s;
         }
-
         .btn-whatsapp:active { transform: scale(0.98); }
 
         /* Siteye Git Butonu */
         .btn-enter {
             background-color: var(--md-sys-color-primary);
             color: white;
-            padding: 14px;
+            padding: 16px;
             border-radius: 24px;
             border: none;
             font-family: var(--font-ui);
             font-weight: 500;
             font-size: 1rem;
             cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             transition: transform 0.2s;
         }
-
         .btn-enter:active { transform: scale(0.98); }
 
 
@@ -200,10 +208,10 @@
 </head>
 <body>
 
-    <!-- --- GİRİŞ POPUP (KARŞILAMA EKRANI) --- -->
+    <!-- --- GİRİŞ POPUP (DÜZELTİLMİŞ VERSİYON) --- -->
     <div id="intro-overlay">
         <div class="intro-content">
-            <span class="intro-heading"><strong>Bu Afiş Sana Bir Hatırlatma İçindir</strong></span>
+            <span class="intro-heading">Bu Afiş Sana Bir<br>Hatırlatma İçindir</span>
             
             <div class="intro-text">
                 Hayat hızlı, vakit dar…<br>
@@ -281,18 +289,16 @@
     <script src="sozler.js"></script>
     
     <script>
-        // Popup Kapatma Fonksiyonu
+        // Popup Kapatma
         function popupKapat() {
             const overlay = document.getElementById('intro-overlay');
             overlay.style.opacity = '0';
-            overlay.style.visibility = 'hidden';
-            // Arka planda animasyon bitince tamamen kaldırmak için (isteğe bağlı)
             setTimeout(() => {
                 overlay.style.display = 'none';
             }, 500);
         }
 
-        // Metin Boyutunu Ayarlama
+        // Font Ayarı
         function yaziBoyutunuAyarla(metin) {
             const element = document.getElementById('quote-text');
             const uzunluk = metin.length;
@@ -305,7 +311,7 @@
             else { element.style.fontSize = (baseSize - 0.3) + "rem"; }
         }
 
-        // Rastgele Söz Getirme
+        // Rastgele Söz
         function rastgeleSozGetir() {
             if (typeof sozlerListesi !== 'undefined' && sozlerListesi.length > 0) {
                 const quoteText = document.getElementById('quote-text');
@@ -325,7 +331,6 @@
         window.onload = rastgeleSozGetir;
         window.onresize = function() { yaziBoyutunuAyarla(document.getElementById('quote-text').innerText); };
         
-        // Dialog dışına tıklama kapatma
         document.getElementById('about-dialog').addEventListener('click', (e) => {
             if (e.target === document.getElementById('about-dialog')) document.getElementById('about-dialog').close();
         });
