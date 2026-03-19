@@ -2,319 +2,289 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tevafuk | Sözlerin Hikmeti</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tevafuk</title>
     
-    <!-- Material Design 3 Fontları -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Noto+Serif:wght@400;700&display=swap" rel="stylesheet">
-    <!-- İkonlar -->
+    <!-- Google Fonts & Material Symbols -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-    
-    <style>
-        /* --- MD3 DEĞİŞKENLER --- */
-        :root {
-            --md-sys-color-surface: #FFFFFF;
-            --md-sys-color-on-surface: #1D1B20;
-            --md-sys-color-primary: #006A6A;
-            --md-sys-color-primary-container: #CCE8E7;
-            --md-sys-color-on-primary-container: #051F1F;
-            --font-ui: 'Roboto', sans-serif;
-            --font-quote: 'Noto Serif', serif;
-        }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+    <style>
+        /* Genel Ayarlar ve Metin Seçimini Engelleme */
+        * {
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
-            background-color: var(--md-sys-color-surface);
-            color: var(--md-sys-color-on-surface);
-            font-family: var(--font-ui);
+            background-color: #000000;
+            color: #ffffff;
             height: 100vh;
-            height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden; /* Ana sayfa kaymasın */
+            width: 100vw;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            position: relative;
         }
 
-        /* --- GİRİŞ POPUP (KESİN ÇÖZÜM) --- */
-        #intro-overlay {
-            position: fixed;
+        /* Tam Ekran Video */
+        #mainVideo {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #FDFBFF;
-            z-index: 9999;
-            display: block; 
-            overflow-y: scroll; /* Mobilde kaydırmayı zorla */
-            -webkit-overflow-scrolling: touch; /* iPhone akıcı kaydırma */
-        }
-
-        .intro-content {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto; 
-            padding: 40px 24px 80px 24px; 
-            text-align: center;
-        }
-
-        /* Başlık ve Metin Ayarları */
-        .intro-heading {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--md-sys-color-primary);
-            margin-bottom: 24px;
-            display: block;
-            line-height: 1.3;
-        }
-
-        .intro-text {
-            font-family: var(--font-quote);
-            font-size: 1.1rem;
-            line-height: 1.6;
-            color: #49454F;
-            margin-bottom: 30px;
-        }
-
-        .intro-text strong {
-            color: var(--md-sys-color-primary);
-            font-weight: 700;
-        }
-
-        /* Vurucu Söz Kutusu */
-        .impact-quote {
-            border-left: 4px solid var(--md-sys-color-primary);
-            background-color: #F2F8F8;
-            padding: 12px 16px;
-            margin: 20px 0;
-            font-style: italic;
-            color: #004D4D;
-            text-align: center;
-            border-radius: 0 8px 8px 0;
-            font-weight: 500;
-        }
-
-        /* Buton Grubu */
-        .button-group {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        /* Instagram Butonu (Güncellendi) */
-        .btn-instagram {
-            /* Instagram Gradient Rengi */
-            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-            color: white;
-            padding: 16px;
-            border-radius: 24px;
-            border: none;
-            font-family: var(--font-ui);
-            font-weight: 500;
-            font-size: 1rem;
+            object-fit: cover; /* Videonun ekranı tam kaplamasını sağlar */
+            z-index: 1;
             cursor: pointer;
+        }
+
+        /* Merkezdeki Oynatma Butonu */
+        #playBtn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            background: rgba(0, 0, 0, 0.6); 
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
             display: flex;
-            align-items: center;
             justify-content: center;
-            gap: 10px;
-            text-decoration: none;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            align-items: center;
+            cursor: pointer;
+            border: none;
+            color: #ffffff;
+            transition: transform 0.2s ease, background 0.2s ease;
         }
 
-        /* Siteye Git Butonu */
-        .btn-enter {
-            background-color: var(--md-sys-color-primary);
-            color: white;
-            padding: 16px;
-            border-radius: 24px;
+        #playBtn:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        #playBtn span {
+            font-size: 48px;
+            margin-left: 4px; /* İkonun optik ortalanması */
+        }
+
+        /* Çok Küçük ve Çerçevesiz Bilgi Butonu */
+        .info-btn {
+            position: fixed;
+            bottom: 8px; /* En sağ alt köşe */
+            right: 8px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.4); /* Yarı saydam görünüm */
             border: none;
-            font-family: var(--font-ui);
-            font-weight: 500;
-            font-size: 1rem;
             cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 10;
+            padding: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: color 0.2s ease;
+            outline: none;
+        }
+
+        .info-btn:hover {
+            color: rgba(255, 255, 255, 1);
+        }
+
+        .info-btn span {
+            font-size: 20px; /* Oldukça küçük ikon */
+        }
+
+        /* Material Design 3 Dialog (Pencere) */
+        dialog {
+            margin: auto; 
+            background-color: #1E1E20; 
+            color: #E3E3E3; 
+            border: none;
+            border-radius: 28px; 
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 8px 12px 6px rgba(0,0,0,0.15), 0 4px 4px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 20;
+        }
+
+        dialog[open] {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        dialog::backdrop {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        dialog[open]::backdrop {
+            opacity: 1;
+        }
+
+        .dialog-icon {
+            color: #E3E3E3; 
+            display: flex;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .dialog-title {
+            margin: 0 0 16px 0;
+            font-size: 1.5rem;
+            font-weight: 400;
+            text-align: center;
+            color: #E3E3E3;
+        }
+
+        .dialog-content {
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: #C4C7C5; 
+            margin-bottom: 24px;
+        }
+
+        .dialog-content a {
+            color: #E3E3E3; 
+            text-decoration: underline;
+            font-weight: 500;
+            -webkit-user-select: auto;
+            user-select: auto;
+        }
+
+        .dialog-content a:hover {
+            color: #FFFFFF;
+        }
+
+        .dialog-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        /* M3 Text Button */
+        .m3-button {
+            background: transparent;
+            color: #E3E3E3; 
+            border: none;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-family: inherit;
+        }
+
+        .m3-button:hover {
+            background-color: rgba(255, 255, 255, 0.08); 
         }
         
-        .btn-enter:active, .btn-instagram:active { transform: scale(0.98); }
-
-
-        /* --- NORMAL ARAYÜZ --- */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 24px;
-            height: 64px;
-        }
-
-        .logo-img { height: 40px; width: auto; object-fit: contain; }
-
-        .icon-btn {
-            background: none; border: none; cursor: pointer;
-            padding: 8px; border-radius: 50%; color: #49454F;
-        }
-
-        main {
-            flex-grow: 1; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; padding: 40px;
-            cursor: pointer; -webkit-tap-highlight-color: transparent;
-        }
-
-        #quote-text {
-            font-family: var(--font-quote); text-align: center;
-            line-height: 1.4; font-weight: 600; color: #1D1B20;
-            max-width: 800px; transition: opacity 0.3s ease;
-        }
-
-        .hint-text {
-            margin-top: 40px; font-size: 12px; color: #909090; opacity: 0.7;
-        }
-
-        .fab {
-            position: absolute; bottom: 24px; right: 24px;
-            width: 56px; height: 56px; border-radius: 16px;
-            background-color: var(--md-sys-color-primary-container);
-            color: var(--md-sys-color-on-primary-container);
-            border: none; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1); cursor: pointer;
-        }
-
-        dialog {
-            margin: auto; padding: 24px; border: none; border-radius: 28px;
-            background-color: #F7F2FA; max-width: 90%; width: 340px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            font-family: var(--font-ui);
-        }
-        dialog::backdrop { background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(2px); }
-        .dialog-content { font-size: 14px; line-height: 1.6; color: #49454F; margin-bottom: 24px; }
-        .text-btn {
-            background: none; border: none; color: var(--md-sys-color-primary);
-            font-weight: 500; font-size: 14px; padding: 10px 24px; cursor: pointer;
+        .m3-button:active {
+            background-color: rgba(255, 255, 255, 0.12);
         }
     </style>
 </head>
 <body>
 
-    <!-- GİRİŞ POPUP -->
-    <div id="intro-overlay">
-        <div class="intro-content">
-            <span class="intro-heading">Bu Karşılaşma<br>Tesadüf Değil, Tevafuk</span>
-            
-            <div class="intro-text">
-                Merak edip bu kodu okuttun...<br>
-                Belki öylesine, belki de kalbinde bir ferahlık arıyordun.
-                <br><br>
-                Hayat hızlı, vakit dar…<br>
-                Ama <strong>namaz</strong> beklemez kardeşim.
-                
-                <!-- Vurucu Söz Alanı -->
-                <div class="impact-quote">
-                    "Yarın kılarım diyenin,<br>
-                    bugün kıldık namazını..."
-                </div>
+    <!-- Aynı Klasördeki Video Bağlantısı -->
+    <video id="mainVideo" playsinline preload="auto">
+        <source src="video.mp4" type="video/mp4">
+        Tarayıcınız video etiketini desteklemiyor.
+    </video>
 
-                Bu dijital çağrı, seni ekranlardan alıp<br>
-                <strong>Rabbine yöneltmek</strong> için karşına çıktı.
-                <br><br>
-                <strong>Yarını bekleme. Bugün gel.</strong><br>
-                Kalbin yorgunsa huzur secdede,<br>
-                aklın dağınıksa toparlanış secdede.
-                <br><br>
-                Şimdi "Siteye Göz At" diyerek<br>
-                kalbine dokunacak bir söz seçebilirsin.
-                <br><br>
-                Eğer aklına takılan bir şey olursa,<br>
-                aşağıdaki butondan bana direkt yazabilirsin.
-            </div>
-
-            <div class="button-group">
-                <!-- INSTAGRAM BUTONU -->
-                <a href="https://www.instagram.com/tevafuk.tr" target="_blank" class="btn-instagram">
-                    <span class="material-symbols-outlined">send</span> <!-- İkonu mesaj gönderme simgesi yaptım -->
-                    Instagram'dan Mesaj At
-                </a>
-                
-                <button class="btn-enter" onclick="popupKapat()">
-                    Siteye Göz At
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- NORMAL SİTE -->
-    <header>
-        <img src="logo.png" alt="Tevafuk" class="logo-img" onerror="this.style.display='none'">
-        <button class="icon-btn" onclick="document.getElementById('about-dialog').showModal()">
-            <span class="material-symbols-outlined">info</span>
-        </button>
-    </header>
-
-    <main onclick="rastgeleSozGetir()">
-        <h1 id="quote-text">...</h1>
-        <div class="hint-text">Değiştirmek için dokunun</div>
-    </main>
-
-    <button class="fab" onclick="rastgeleSozGetir()">
-        <span class="material-symbols-outlined">shuffle</span>
+    <!-- Oynatma Butonu -->
+    <button id="playBtn" aria-label="Oynat">
+        <span class="material-symbols-outlined">play_arrow</span>
     </button>
 
-    <dialog id="about-dialog">
-        <h2 style="font-size:24px; margin-bottom:16px;">Tevafuk Projesi</h2>
-        <div class="dialog-content">
-            <p><strong>Başlangıç:</strong> 26 Kasım 2025</p>
-            <br>
-            <p>Bu proje, insanları İslam'ın güzelliklerine çağırmak ve namazı hatırlatmak niyetiyle; tamamen Allah rızası gözetilerek hazırlanmıştır.</p>
+    <!-- Köşedeki Gizli/Küçük i Butonu -->
+    <button class="info-btn" id="openDialogBtn" aria-label="Bilgi">
+        <span class="material-symbols-outlined">info</span>
+    </button>
+
+    <!-- Bilgi Penceresi -->
+    <dialog id="infoDialog">
+        <div class="dialog-icon">
+            <span class="material-symbols-outlined" style="font-size: 32px;">info</span>
         </div>
-        <div style="display:flex; justify-content:flex-end;">
-            <button class="text-btn" onclick="document.getElementById('about-dialog').close()">Kapat</button>
+        <h2 class="dialog-title">'Tevafuk' Projesi</h2>
+        <div class="dialog-content">
+            <p><strong>Başlangıç:</strong> 26 Kasım 2025</p><br>
+            <p>Bu proje, insanları İslam'ın güzelliklerine çağırmak ve namazı hatırlatmak niyetiyle; tamamen Allah rızası gözetilerek hazırlanmıştır.</p><br>
+            <p>Ayrıca detaylı bilgi ve daha fazlası için Instagram;<br>
+            <a href="https://www.instagram.com/tevafuk.tr" target="_blank">https://www.instagram.com/tevafuk.tr</a></p>
+        </div>
+        <div class="dialog-actions">
+            <button class="m3-button" id="closeDialogBtn">Kapat</button>
         </div>
     </dialog>
 
-    <script src="sozler.js"></script>
-    
+    <!-- İşlevsellik Script'i -->
     <script>
-        function popupKapat() {
-            const overlay = document.getElementById('intro-overlay');
-            overlay.style.transition = "opacity 0.5s ease";
-            overlay.style.opacity = '0';
-            setTimeout(() => { overlay.style.display = 'none'; }, 500);
-        }
+        const video = document.getElementById('mainVideo');
+        const playBtn = document.getElementById('playBtn');
+        const dialog = document.getElementById('infoDialog');
+        const openBtn = document.getElementById('openDialogBtn');
+        const closeBtn = document.getElementById('closeDialogBtn');
 
-        function yaziBoyutunuAyarla(metin) {
-            const element = document.getElementById('quote-text');
-            const uzunluk = metin.length;
-            const ekranGenislik = window.innerWidth;
-            let baseSize = ekranGenislik < 600 ? 1.6 : 2.8;
+        // Ortadaki Oynatma Butonuna Basıldığında
+        playBtn.addEventListener('click', () => {
+            video.play();
+            playBtn.style.display = 'none'; // Butonu gizle
+        });
 
-            if (uzunluk < 40) element.style.fontSize = (baseSize + 1.2) + "rem";
-            else if (uzunluk < 80) element.style.fontSize = (baseSize + 0.5) + "rem";
-            else if (uzunluk < 150) element.style.fontSize = baseSize + "rem";
-            else element.style.fontSize = (baseSize - 0.3) + "rem";
-        }
-
-        function rastgeleSozGetir() {
-            if (typeof sozlerListesi !== 'undefined' && sozlerListesi.length > 0) {
-                const quoteText = document.getElementById('quote-text');
-                quoteText.style.opacity = 0;
-                quoteText.style.transform = "translateY(-10px)";
-                
-                setTimeout(() => {
-                    const randomSoz = sozlerListesi[Math.floor(Math.random() * sozlerListesi.length)];
-                    quoteText.innerText = randomSoz;
-                    yaziBoyutunuAyarla(randomSoz);
-                    quoteText.style.transform = "translateY(0)";
-                    quoteText.style.opacity = 1;
-                }, 250);
+        // Videoya Tıklandığında (Durdurma İşlemi)
+        video.addEventListener('click', () => {
+            if (!video.paused) {
+                video.pause();
+                playBtn.style.display = 'flex'; // Butonu tekrar göster
             }
-        }
+        });
 
-        window.onload = rastgeleSozGetir;
-        window.onresize = function() { yaziBoyutunuAyarla(document.getElementById('quote-text').innerText); };
-        
-        document.getElementById('about-dialog').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('about-dialog')) document.getElementById('about-dialog').close();
+        // Videonun sonuna gelindiğinde butonu geri getir
+        video.addEventListener('ended', () => {
+            playBtn.style.display = 'flex';
+        });
+
+        // i Butonuna Basıldığında (Pencereyi Aç)
+        openBtn.addEventListener('click', () => {
+            // Eğer video oynuyorsa bilgi ekranı açılınca durdur
+            if (!video.paused) {
+                video.pause();
+                playBtn.style.display = 'flex';
+            }
+            dialog.showModal();
+        });
+
+        // Pencereyi Kapat (Buton ile)
+        closeBtn.addEventListener('click', () => {
+            dialog.close();
+        });
+
+        // Pencereyi Kapat (Arkaplana tıklayınca)
+        dialog.addEventListener('click', (e) => {
+            const dialogDimensions = dialog.getBoundingClientRect()
+            if (
+                e.clientX < dialogDimensions.left ||
+                e.clientX > dialogDimensions.right ||
+                e.clientY < dialogDimensions.top ||
+                e.clientY > dialogDimensions.bottom
+            ) {
+                dialog.close();
+            }
         });
     </script>
+
 </body>
 </html>
