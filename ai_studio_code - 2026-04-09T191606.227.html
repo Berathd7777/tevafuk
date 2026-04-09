@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tevafuk</title>
+    
+    <!-- Google Fonts & Material Symbols (İnce Font 300 Eklendi) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+    <style>
+        /* Genel Ayarlar */
+        * {
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent; 
+        }
+
+        *:focus {
+            outline: none !important;
+        }
+
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            position: relative;
+        }
+
+        /* Video */
+        #mainVideo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+            cursor: pointer;
+        }
+
+        /* Oynatma Butonu */
+        #playBtn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            background: rgba(0, 0, 0, 0.6); 
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border: none;
+            color: #ffffff;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        #playBtn:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        #playBtn span { font-size: 48px; margin-left: 4px; }
+
+        /* Bilgi Butonu */
+        .info-btn {
+            position: fixed;
+            bottom: 8px; right: 8px;
+            background: transparent; color: rgba(255, 255, 255, 0.4); 
+            border: none; cursor: pointer; z-index: 10; padding: 4px;
+            display: flex; justify-content: center; align-items: center;
+            transition: color 0.2s ease;
+        }
+        .info-btn:hover { color: rgba(255, 255, 255, 1); }
+        .info-btn span { font-size: 20px; }
+
+        /* Bilgi Penceresi */
+        dialog {
+            margin: auto; background-color: #1E1E20; color: #E3E3E3; 
+            border: none; border-radius: 28px; padding: 24px;
+            width: 90%; max-width: 400px;
+            box-shadow: 0 8px 12px 6px rgba(0,0,0,0.15), 0 4px 4px rgba(0,0,0,0.3);
+            opacity: 0; transform: scale(0.9);
+            transition: opacity 0.3s ease, transform 0.3s ease; z-index: 20;
+        }
+        dialog[open] { opacity: 1; transform: scale(1); }
+        dialog::backdrop { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s ease; }
+        dialog[open]::backdrop { opacity: 1; }
+
+        .dialog-icon { color: #E3E3E3; display: flex; justify-content: center; margin-bottom: 16px; }
+        .dialog-title { margin: 0 0 16px 0; font-size: 1.5rem; font-weight: 400; text-align: center; }
+        .dialog-content { font-size: 0.875rem; line-height: 1.6; color: #C4C7C5; margin-bottom: 24px; }
+        .dialog-content a { color: #E3E3E3; text-decoration: underline; font-weight: 500; user-select: auto; }
+        .dialog-actions { display: flex; justify-content: flex-end; }
+        .m3-button { background: transparent; color: #E3E3E3; border: none; padding: 10px 16px; border-radius: 20px; font-weight: 500; cursor: pointer; }
+        .m3-button:hover { background-color: rgba(255, 255, 255, 0.08); }
+
+        /* VİDEO BİTİŞ EKRANI (SİYAH EKRAN) */
+        #endScreen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #000000;
+            z-index: 30;
+            display: none; /* Video bitince flex olacak */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .end-title {
+            position: absolute;
+            top: 15%;
+            font-weight: 300; /* İnce Font */
+            font-size: 2rem;
+            letter-spacing: 2px;
+            color: #ffffff;
+            text-align: center;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .end-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .end-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 12px 32px;
+            border-radius: 30px;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 300; /* İnce Font */
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: background 0.3s, border-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .end-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #ffffff;
+        }
+
+        /* CAMİ LİSTESİ EKRANI */
+        #mosqueScreen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 40;
+            display: none;
+            flex-direction: column;
+            padding: 40px 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        #mosqueScreen h2 {
+            font-weight: 300;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        #nearestMosque {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        #nearestMosque h3 { font-weight: 400; margin-bottom: 5px; font-size: 1.3rem;}
+        #nearestMosque p { font-weight: 300; color: #ccc; }
+
+        .other-mosques {
+            flex: 1;
+            overflow-y: auto;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 10px;
+        }
+
+        .mosque-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-weight: 300;
+        }
+
+        .mosque-item span.dist { color: #aaa; font-size: 0.9rem; }
+
+        .close-mosque-btn {
+            margin-top: 20px;
+            align-self: center;
+            background: transparent;
+            color: #fff;
+            border: 1px solid #fff;
+            padding: 8px 24px;
+            border-radius: 20px;
+            font-weight: 300;
+            cursor: pointer;
+        }
+
+        /* Yükleniyor Animasyonu */
+        #loadingText {
+            display: none;
+            text-align: center;
+            font-weight: 300;
+            margin-top: 10px;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+
+    <video id="mainVideo" playsinline preload="auto">
+        <source src="video.mp4" type="video/mp4">
+        Tarayıcınız video etiketini desteklemiyor.
+    </video>
+
+    <button id="playBtn" aria-label="Oynat">
+        <span class="material-symbols-outlined">play_arrow</span>
+    </button>
+
+    <button class="info-btn" id="openDialogBtn" aria-label="Bilgi">
+        <span class="material-symbols-outlined">info</span>
+    </button>
+
+    <!-- Bilgi Penceresi -->
+    <dialog id="infoDialog">
+        <div class="dialog-icon"><span class="material-symbols-outlined" style="font-size: 32px;">info</span></div>
+        <h2 class="dialog-title">'Tevafuk' Projesi</h2>
+        <div class="dialog-content">
+            <p><strong>Başlangıç:</strong> 26 Kasım 2025</p><br>
+            <p>Bu proje, insanları İslam'ın güzelliklerine çağırmak ve namazı hatırlatmak niyetiyle; tamamen Allah rızası gözetilerek hazırlanmıştır.</p><br>
+            <p>Ayrıca detaylı bilgi ve daha fazlası için Instagram;<br>
+            <a href="https://www.instagram.com/tevafuk.tr" target="_blank">https://www.instagram.com/tevafuk.tr</a></p>
+        </div>
+        <div class="dialog-actions"><button class="m3-button" id="closeDialogBtn">Kapat</button></div>
+    </dialog>
+
+    <!-- VİDEO BİTİŞ EKRANI -->
+    <div id="endScreen">
+        <div class="end-title">Ya bu son çağrıysa?</div>
+        <div class="end-buttons">
+            <button class="end-btn" id="findMosqueBtn">
+                <span class="material-symbols-outlined">mosque</span>
+                En Yakın Camiyi Bul
+            </button>
+            <button class="end-btn" id="shareBtn">
+                <span class="material-symbols-outlined">share</span>
+                Paylaş
+            </button>
+            <div id="loadingText">Konum aranıyor...</div>
+        </div>
+    </div>
+
+    <!-- CAMİ SONUÇLARI EKRANI -->
+    <div id="mosqueScreen">
+        <h2>Sana En Yakın Cami</h2>
+        <div id="nearestMosque">
+            <!-- JS ile doldurulacak -->
+        </div>
+        <h3 style="font-weight: 300; font-size: 1rem; color: #888; margin-bottom: 10px;">Yakındaki Diğer Camiler</h3>
+        <div class="other-mosques" id="otherMosquesList">
+            <!-- JS ile doldurulacak -->
+        </div>
+        <button class="close-mosque-btn" id="closeMosqueScreen">Geri Dön</button>
+    </div>
+
+    <script>
+        const video = document.getElementById('mainVideo');
+        const playBtn = document.getElementById('playBtn');
+        const dialog = document.getElementById('infoDialog');
+        const openBtn = document.getElementById('openDialogBtn');
+        const closeBtn = document.getElementById('closeDialogBtn');
+        const endScreen = document.getElementById('endScreen');
+        
+        // Bitiş ekranı butonları
+        const shareBtn = document.getElementById('shareBtn');
+        const findMosqueBtn = document.getElementById('findMosqueBtn');
+        const loadingText = document.getElementById('loadingText');
+        const mosqueScreen = document.getElementById('mosqueScreen');
+        const closeMosqueScreen = document.getElementById('closeMosqueScreen');
+
+        /* -----------------------------------------
+           1. VİDEO OYNATMA VE BİTİŞ AYARLARI
+        ----------------------------------------- */
+        playBtn.addEventListener('click', () => {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) elem.requestFullscreen().catch(err => console.log(err));
+            else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+            
+            video.play();
+            playBtn.style.display = 'none'; 
+        });
+
+        video.addEventListener('click', () => {
+            if (!video.paused) {
+                video.pause();
+                playBtn.style.display = 'flex';
+            }
+        });
+
+        // VİDEO BİTİNCE ÇALIŞACAK KOD
+        video.addEventListener('ended', () => {
+            playBtn.style.display = 'none'; // Oynat butonunu gizle
+            openBtn.style.display = 'none'; // i butonunu gizle
+            
+            // Siyah ekranı yavaşça göster
+            endScreen.style.display = 'flex';
+            setTimeout(() => {
+                endScreen.style.opacity = '1';
+            }, 50);
+        });
+
+        /* -----------------------------------------
+           2. PAYLAŞ BUTONU AYARLARI (WhatsApp)
+        ----------------------------------------- */
+        shareBtn.addEventListener('click', () => {
+            const text = encodeURIComponent("Bu son çağrın olabilir! https://tevafuk.netlify.app");
+            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+        });
+
+        /* -----------------------------------------
+           3. EN YAKIN CAMİYİ BUL AYARLARI
+        ----------------------------------------- */
+        findMosqueBtn.addEventListener('click', () => {
+            loadingText.style.display = 'block';
+            loadingText.innerText = "Konum aranıyor...";
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        loadingText.innerText = "Camiler bulunuyor...";
+                        fetchMosques(lat, lon);
+                    },
+                    error => {
+                        loadingText.innerText = "Konum izni verilmedi veya alınamadı.";
+                        setTimeout(() => { loadingText.style.display = 'none'; }, 3000);
+                    }
+                );
+            } else {
+                loadingText.innerText = "Tarayıcınız konum özelliğini desteklemiyor.";
+            }
+        });
+
+        // OpenStreetMap Overpass API ile Yakındaki Camileri Çekme
+        async function fetchMosques(userLat, userLon) {
+            // 5000 metre (5km) yarıçapındaki camileri arar
+            const query = `
+                [out:json];
+                (
+                  node["amenity"="place_of_worship"]["religion"="muslim"](around:5000,${userLat},${userLon});
+                  way["amenity"="place_of_worship"]["religion"="muslim"](around:5000,${userLat},${userLon});
+                );
+                out center;
+            `;
+            const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                let mosques = [];
+                data.elements.forEach(el => {
+                    let mLat = el.lat || (el.center && el.center.lat);
+                    let mLon = el.lon || (el.center && el.center.lon);
+                    // İsmi olmayan camilere standart isim ver
+                    let name = (el.tags && el.tags.name) ? el.tags.name : "Yakınlardaki Cami/Mescid";
+                    let distance = calculateDistance(userLat, userLon, mLat, mLon);
+                    mosques.push({ name, distance });
+                });
+
+                // Mesafeye göre sırala
+                mosques.sort((a, b) => a.distance - b.distance);
+
+                if(mosques.length > 0) {
+                    showMosqueResults(mosques);
+                } else {
+                    loadingText.innerText = "Yakınlarda cami bulunamadı.";
+                    setTimeout(() => { loadingText.style.display = 'none'; }, 3000);
+                }
+
+            } catch (error) {
+                loadingText.innerText = "Bağlantı hatası oluştu.";
+                setTimeout(() => { loadingText.style.display = 'none'; }, 3000);
+            }
+        }
+
+        // Sonuçları Ekrana Yazdırma
+        function showMosqueResults(mosques) {
+            loadingText.style.display = 'none';
+            endScreen.style.display = 'none';
+            
+            const nearestContainer = document.getElementById('nearestMosque');
+            const listContainer = document.getElementById('otherMosquesList');
+            
+            // Listeleri temizle
+            listContainer.innerHTML = "";
+
+            // En yakın camiyi yaz
+            const nearest = mosques[0];
+            nearestContainer.innerHTML = `
+                <h3>${nearest.name}</h3>
+                <p>Mesafe: ${formatDistance(nearest.distance)}</p>
+            `;
+
+            // Diğer camileri listele (en fazla 10 tane)
+            for(let i = 1; i < Math.min(mosques.length, 11); i++) {
+                let div = document.createElement('div');
+                div.className = 'mosque-item';
+                div.innerHTML = `<span>${mosques[i].name}</span> <span class="dist">${formatDistance(mosques[i].distance)}</span>`;
+                listContainer.appendChild(div);
+            }
+
+            mosqueScreen.style.display = 'flex';
+            setTimeout(() => { mosqueScreen.style.opacity = '1'; }, 50);
+        }
+
+        // Cami Ekranını Kapatma
+        closeMosqueScreen.addEventListener('click', () => {
+            mosqueScreen.style.opacity = '0';
+            setTimeout(() => {
+                mosqueScreen.style.display = 'none';
+                endScreen.style.display = 'flex'; // Siyah ekrana geri dön
+            }, 300);
+        });
+
+        // Haversine Formülü ile Kuş Uçuşu Mesafe Hesaplama (Kilometre cinsinden)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; 
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c; 
+        }
+
+        // Mesafeyi okunabilir formata çevirme
+        function formatDistance(distInKm) {
+            if(distInKm < 1) {
+                return Math.round(distInKm * 1000) + " m";
+            }
+            return distInKm.toFixed(1) + " km";
+        }
+
+        /* -----------------------------------------
+           4. BİLGİ PENCERESİ AYARLARI
+        ----------------------------------------- */
+        openBtn.addEventListener('click', () => {
+            if (!video.paused) {
+                video.pause();
+                playBtn.style.display = 'flex';
+            }
+            dialog.showModal();
+        });
+        closeBtn.addEventListener('click', () => dialog.close());
+        dialog.addEventListener('click', (e) => {
+            const dialogDimensions = dialog.getBoundingClientRect()
+            if (e.clientX < dialogDimensions.left || e.clientX > dialogDimensions.right ||
+                e.clientY < dialogDimensions.top || e.clientY > dialogDimensions.bottom) {
+                dialog.close();
+            }
+        });
+    </script>
+</body>
+</html>
